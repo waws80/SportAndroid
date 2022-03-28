@@ -14,7 +14,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        manifestPlaceholders = [BAIDU_KEY: 'bEBfEEhVPnTyCNvnI1SyHNYzBf2EhzFy']
+        manifestPlaceholders = [BAIDU_KEY: 'NxOiz8GE5k1IhbHZO0sMTGsVIayYmp9q']
     }
 
     signingConfigs {

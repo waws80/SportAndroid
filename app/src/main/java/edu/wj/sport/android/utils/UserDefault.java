@@ -46,6 +46,13 @@ public class UserDefault {
     }
 
 
+    public String getUserId(){
+        if (getUserInfo() == null){
+            return "";
+        }
+        return getUserInfo().getId();
+    }
+
     public void clear(){
         sp.edit().putBoolean("isLogin", false).apply();
     }

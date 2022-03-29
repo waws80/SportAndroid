@@ -2,36 +2,41 @@ package edu.wj.sport.android.bean;
 
 public class UserBean {
 
-    private int id;
+    private String id;
 
-    private String phone;
+    private String phoneNumber;
 
     private String nickname;
 
     private int sex;
 
-    public UserBean(int id, String phone, String nickname, int sex) {
-        this.id = id;
-        this.phone = phone;
-        this.nickname = nickname;
+    private long birthDate;
 
+    private String avatar;
+
+    public UserBean(String id, String phoneNumber, String nickname, int sex, long birthDate, String avatar) {
+        this.id = id;
+        this.phoneNumber = phoneNumber;
+        this.nickname = nickname;
         this.sex = sex;
+        this.birthDate = birthDate;
+        this.avatar = avatar;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
     public String getPhone() {
-        return phone;
+        return phoneNumber;
     }
 
     public void setPhone(String phone) {
-        this.phone = phone;
+        this.phoneNumber = phone;
     }
 
 
@@ -51,6 +56,22 @@ public class UserBean {
         this.sex = sex;
     }
 
+
+    public long getBirthDate() {
+        return birthDate;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public void setBirthDate(long birthDate) {
+        this.birthDate = birthDate;
+    }
 
     public String getSexStr(){
         String str = "男";

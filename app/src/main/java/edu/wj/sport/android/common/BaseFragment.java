@@ -20,6 +20,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import edu.wj.sport.android.R;
+import edu.wj.sport.android.ui.LoginActivity;
 import edu.wj.sport.android.utils.HttpUtils;
 
 public abstract class BaseFragment<VB extends ViewBinding> extends Fragment {
@@ -122,6 +123,15 @@ public abstract class BaseFragment<VB extends ViewBinding> extends Fragment {
         @Override
         protected void onError(HttpUtils.ResultBean bean) {
             bean.toast();
+            if (bean.getCode() == 401 || bean.getCode() == 403){
+                startActivity(new Intent(getContext(), LoginActivity.class));
+                requireActivity().onBackPressed();
+                if (bean.getCode() == 403){
+                    toast("当前账号被封禁");
+                }else {
+                    toast("当前账号未登录");
+                }
+            }
         }
     }
 }

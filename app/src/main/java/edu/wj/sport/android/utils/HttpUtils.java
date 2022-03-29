@@ -1,16 +1,21 @@
 package edu.wj.sport.android.utils;
 
+import android.annotation.SuppressLint;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.MainThread;
+import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +25,8 @@ import edu.wj.sport.android.SportApplication;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Headers;
+import okhttp3.Interceptor;
+import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttp;
 import okhttp3.OkHttpClient;
@@ -33,13 +40,40 @@ import okhttp3.ResponseBody;
  */
 public final class HttpUtils {
 
-    public static final String BASE_URL = "http://192.168.0.100/keep/";
+    private static final String IP = "192.168.1.3:8080";
 
-    public static final String IMG_URL = "http://192.168.0.100/keep/img/";
+    public static final String BASE_URL = "http://" + IP + "/sport/";
+
+    public static final String IMG_URL = "http://" + IP + "/sport/resources/";
+
+    /**
+     * 设备信息
+     */
+    @SuppressLint("HardwareIds")
+    public static String DEVICE_INFO = android.os.Build.VERSION.RELEASE
+            + "-"
+            + android.os.Build.MODEL
+            + "-"
+            + android.os.Build.BRAND
+            + "-"
+            + Settings.Secure.getString(SportApplication.getApplication().getContentResolver(), Settings.Secure.ANDROID_ID);
 
     private static final OkHttpClient okHttpClient = new OkHttpClient.Builder()
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
+            .addInterceptor(new Interceptor() {
+                @NonNull
+                @Override
+                public Response intercept(@NonNull Chain chain) throws IOException {
+                    Request request;
+                    request = chain.request()
+                            .newBuilder()
+                            .addHeader("id", UserDefault.getInstance().getUserId())
+                            .addHeader("deviceInfo", DEVICE_INFO)
+                            .build();
+                    return chain.proceed(request);
+                }
+            })
             .build();
 
 
@@ -60,13 +94,33 @@ public final class HttpUtils {
         this.call(buildRequest("POST", path, body), callback);
     }
 
+    public void uploadAvatar(File file, DataCallback callback){
+        this.uploadFile(FileType.AVATAR, Collections.singletonList(file), callback);
+    }
+
+    public void uploadImage(File file, DataCallback callback){
+        this.uploadFile(FileType.IMAGE, Collections.singletonList(file), callback);
+    }
+
+    public void uploadMedia(File file, DataCallback callback){
+        this.uploadFile(FileType.MEDIA, Collections.singletonList(file), callback);
+    }
+
+    private void uploadFile(FileType type, File file, DataCallback callback){
+        this.uploadFile(type, Collections.singletonList(file), callback);
+    }
+
+    public void uploadFile(FileType type, List<File> files, DataCallback callback){
+        MultipartBody.Builder builder = new MultipartBody.Builder();
+        for (File file : files) {
+            builder.addFormDataPart("file", file.getName(), RequestBody.create(file, MediaType.get("multipart/form-data")));
+        }
+        builder.addFormDataPart("type", type.name());
+        builder.setType(MultipartBody.FORM);
+        this.call(new Request.Builder().method("POST", builder.build()).url(BASE_URL + "file/upload").build(), callback);
+    }
+
     private Request buildRequest(String method, String path, HashMap<String, String> body){
-//        Headers.Builder headerBuilder = new Headers.Builder();
-//        if (!headers.isEmpty()){
-//            for (Map.Entry<String, String> stringStringEntry : headers.entrySet()) {
-//                headerBuilder.add(stringStringEntry.getKey(), stringStringEntry.getValue());
-//            }
-//        }
 
         MultipartBody.Builder  builder = new MultipartBody.Builder();
         for (Map.Entry<String, String> stringStringEntry : body.entrySet()) {
@@ -102,6 +156,7 @@ public final class HttpUtils {
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                Log.d("HttpResult", "http结果:code=========== " + response.code() + "================");
                 if (response.isSuccessful()){
                     ResponseBody body = response.body();
                     if (body == null){
@@ -112,22 +167,17 @@ public final class HttpUtils {
                         });
                     }else {
                         String string = body.string();
-                        Log.d("HttpResult", "http结果===========\n " + string + "\n================");
+                        Log.d("HttpResult", "http结果:data===========\n " + string + "\n================");
                         ThreadUtils.runMain(() -> {
                             callback.complete();
-                            ResultBean bean = GsonUtils.toEntity(ResultBean.class, string);
-                            callback.setResultData(bean);
-                            if (bean.isSuccessful()){
-                                callback.onSuccess();
-                            }else {
-                                callback.onFailed();
-                            }
+                            callback.setResultData(new ResultBean(200, "请求成功", string));
+                            callback.onSuccess();
                         });
                     }
                 }else {
                     ThreadUtils.runMain(() -> {
                         callback.complete();
-                        callback.setResultData(new ResultBean(-1, "请求失败", ""));
+                        callback.setResultData(new ResultBean(response.code(), "请求失败", ""));
                         callback.onFailed();
                     });
                 }

@@ -18,6 +18,7 @@ import java.lang.reflect.ParameterizedType;
 
 import edu.wj.sport.android.R;
 import edu.wj.sport.android.ui.LoginActivity;
+import edu.wj.sport.android.ui.MainActivity;
 import edu.wj.sport.android.ui.RegisterActivity;
 import edu.wj.sport.android.utils.HttpUtils;
 import edu.wj.sport.android.utils.UserDefault;
@@ -114,7 +115,16 @@ public abstract class BaseActivity<VB extends ViewBinding> extends AppCompatActi
 
         @Override
         protected void onError(HttpUtils.ResultBean bean) {
-
+            bean.toast();
+            if (bean.getCode() == 401 || bean.getCode() == 403){
+                startActivity(new Intent(getWindow().getContext(), LoginActivity.class));
+                onBackPressed();
+//                if (bean.getCode() == 403){
+//                    toast("当前账号被封禁");
+//                }else {
+//                    toast("当前账号未登录");
+//                }
+            }
         }
     }
 }

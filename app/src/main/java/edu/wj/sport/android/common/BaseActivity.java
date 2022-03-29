@@ -17,6 +17,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 
 import edu.wj.sport.android.R;
+import edu.wj.sport.android.ui.LoginActivity;
+import edu.wj.sport.android.ui.RegisterActivity;
 import edu.wj.sport.android.utils.HttpUtils;
 import edu.wj.sport.android.utils.UserDefault;
 
@@ -30,11 +32,11 @@ public abstract class BaseActivity<VB extends ViewBinding> extends AppCompatActi
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
-//        if (!UserDefault.getInstance().isLogin() && getClass() != LoginActivity.class && getClass() != RegisterActivity.class){
-//            start(LoginActivity.class);
-//            onBackPressed();
-//            return;
-//        }
+        if (!UserDefault.getInstance().isLogin() && getClass() != LoginActivity.class && getClass() != RegisterActivity.class){
+            start(LoginActivity.class);
+            onBackPressed();
+            return;
+        }
         try {
             Class<?> vbClass = (Class<?>) ((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
             Method method = vbClass.getDeclaredMethod("inflate", LayoutInflater.class);

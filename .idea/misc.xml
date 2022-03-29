@@ -3,9 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Android/Projects/SportAndroid/app/src/main/res/drawable/ic_launcher_background.xml" value="0.2695" />
-        <entry key="..\:/Android/Projects/SportAndroid/app/src/main/res/layout/progress_layout.xml" value="0.33697916666666666" />
+        <entry key="app/src/main/res/drawable/ic_back.xml" value="0.139" />
+        <entry key="app/src/main/res/drawable/shape_edit_bg.xml" value="0.139" />
+        <entry key="app/src/main/res/layout/activity_login.xml" value="0.2028985507246377" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.23020833333333332" />
+        <entry key="app/src/main/res/layout/activity_register.xml" value="0.2028985507246377" />
       </map>
     </option>
   </component>

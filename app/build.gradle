@@ -24,6 +24,12 @@ android {
             storePassword '123456'
             storeFile file('../sport.jks')
         }
+        debug{
+            keyAlias 'sport-android'
+            keyPassword '123456'
+            storePassword '123456'
+            storeFile file('../sport.jks')
+        }
     }
 
     buildTypes {

@@ -7,15 +7,23 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.TranslateAnimation;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import edu.wj.sport.android.R;
 import edu.wj.sport.android.common.BaseActivity;
@@ -27,6 +35,8 @@ import edu.wj.sport.android.ui.fragment.SportFragment;
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     private final List<Fragment> fragmentList = new ArrayList<>();
+
+    private final ExecutorService animationThread = Executors.newSingleThreadExecutor();
 
     private final FragmentStateAdapter adapter = new FragmentStateAdapter(this) {
 
@@ -70,11 +80,16 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     }
 
     public void changeTabBar(){
-//        if (mViewBinding.bottomView.getVisibility() == View.VISIBLE){
-//            mViewBinding.bottomView.setVisibility(View.GONE);
-//        }else {
-//            mViewBinding.bottomView.setVisibility(View.VISIBLE);
-//        }
+        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 56f, getResources().getDisplayMetrics());
+        ViewGroup.LayoutParams layoutParams = mViewBinding.bottomView.getLayoutParams();
+        if (layoutParams.height == 0){
+            layoutParams.height = height;
+            mViewBinding.bottomView.setLayoutParams(layoutParams);
+        }else {
+            layoutParams.height = 0;
+            mViewBinding.bottomView.setLayoutParams(layoutParams);
+        }
+
     }
 
 

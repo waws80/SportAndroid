@@ -1,5 +1,6 @@
 package edu.wj.sport.android.utils;
 
+import android.graphics.Color;
 import android.util.Log;
 
 import androidx.lifecycle.Lifecycle;
@@ -11,6 +12,7 @@ import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
+import com.baidu.mapapi.map.ArcOptions;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BaiduMapOptions;
 import com.baidu.mapapi.map.BitmapDescriptor;
@@ -21,10 +23,13 @@ import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.map.Overlay;
 import com.baidu.mapapi.map.OverlayOptions;
+import com.baidu.mapapi.map.PolylineOptions;
 import com.baidu.mapapi.model.LatLng;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import edu.wj.sport.android.R;
@@ -85,13 +90,6 @@ public final class BaiduMapLocationHelper  extends BDAbstractLocationListener im
             map.setIndoorEnable(true);
             map.setMapType(BaiduMap.MAP_TYPE_NORMAL);
             map.setMyLocationEnabled(true);
-            MyLocationConfiguration configuration =
-                    new MyLocationConfiguration(MyLocationConfiguration.LocationMode.FOLLOWING,
-                            true,
-                            BitmapDescriptorFactory.fromResource(R.drawable.map_icon_start),
-                            0xAAFFFF88,
-                            0xAA00FF00);
-            map.setMyLocationConfiguration(configuration);
         }
 
     }
@@ -118,7 +116,7 @@ public final class BaiduMapLocationHelper  extends BDAbstractLocationListener im
         LocationClientOption option = new LocationClientOption();
         option.setOpenGps(true); // 打开gps
         option.setCoorType("bd09ll"); // 设置坐标类型
-        option.setScanSpan(2000);
+        option.setScanSpan(1000);
         option.setIsNeedAddress(true);
         option.setNeedNewVersionRgc(true);
         option.setIgnoreKillProcess(true);
@@ -182,7 +180,6 @@ public final class BaiduMapLocationHelper  extends BDAbstractLocationListener im
 
     @Override
     public void onReceiveLocation(BDLocation location) {
-        Log.d(TAG, "onReceiveLocation: ");
         if (this.ownerWeakReference == null){
             return;
         }
@@ -215,8 +212,7 @@ public final class BaiduMapLocationHelper  extends BDAbstractLocationListener im
             if (this.mOnLocation != null){
                 if (firstLocation.get()){
                     this.mOnLocation.onFirstLocation(location);
-                    this.markStart(location.getLatitude(), location.getLongitude(), R.drawable.map_icon_start);
-
+                    //this.markStart(location.getLatitude(), location.getLongitude(), R.drawable.map_icon_start);
                 }
                 this.mOnLocation.onLocation(location);
             }
@@ -225,7 +221,7 @@ public final class BaiduMapLocationHelper  extends BDAbstractLocationListener im
         if (owner.getLifecycle().getCurrentState() == Lifecycle.State.RESUMED && (this.flashMapLocation.get() || this.firstLocation.get())){
             LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
             MapStatus.Builder builder = new MapStatus.Builder();
-            builder.target(ll).zoom(16.0f);
+            builder.target(ll).zoom(18.0f);
             BaiduMap baiduMap = this.mapWeakReference.get();
             if (baiduMap == null){
                 return;
@@ -234,6 +230,14 @@ public final class BaiduMapLocationHelper  extends BDAbstractLocationListener im
             baiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
             firstLocation.set(false);
         }
+    }
+
+    /**
+     * 是否正在刷新位置
+     * @return
+     */
+    public boolean isFlashMapLocation(){
+        return this.flashMapLocation.get();
     }
 
 
@@ -265,6 +269,17 @@ public final class BaiduMapLocationHelper  extends BDAbstractLocationListener im
             return;
         }
         map.addOverlay(option);
+    }
+
+
+    public Overlay buildOverlayLine(List<LatLng> points, BaiduMap map){
+        OverlayOptions mOverlayOptions = new PolylineOptions()
+                .width(10)
+                .color(0xAAFF0000)
+                .points(points);
+        //在地图上绘制折线
+        //mPloyline 折线对象
+        return  map.addOverlay(mOverlayOptions);
     }
 
 

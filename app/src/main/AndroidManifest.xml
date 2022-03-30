@@ -7,8 +7,14 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- 写外置存储。如果开发者使用了离线地图，并且数据写在外置存储区域，则需要申请该权限 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- 用于访问wifi网络信息，wifi信息会用于进行网络定位-->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <!-- 这个权限用于获取wifi的获取权限，wifi信息会用来进行网络定位-->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
     <uses-permission android:name="android.permission.BODY_SENSORS" />
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <!-- 写入扩展存储，向扩展卡写入数据，用于写入离线定位数据-->
+<!--    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>-->
 
     <application
         android:name=".SportApplication"
@@ -19,6 +25,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SportAndroid"
         android:usesCleartextTraffic="true">
+        <activity
+            android:name=".ui.SettingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.EditPwdActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.EditInfoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.UserInfoActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.RegisterActivity"
             android:exported="false" />

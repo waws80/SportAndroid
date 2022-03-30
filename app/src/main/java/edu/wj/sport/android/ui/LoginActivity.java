@@ -22,6 +22,11 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
     @Override
     protected void onLoad(@Nullable Bundle savedInstanceState) {
 
+        UserBean bean = UserDefault.getInstance().getUserInfo();
+        if (bean != null){
+            mViewBinding.edtPhone.setText(bean.getPhone());
+        }
+
         mViewBinding.tvRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,7 +65,6 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
         HttpUtils.getInstance().post("user/login", body, new HttpCallback(this) {
             @Override
             protected void onData(HttpUtils.ResultBean bean) {
-                Log.d("TAG", "onData: "+ bean.getData());
                 UserDefault.getInstance().putUserInfo(bean.getEntity(UserBean.class));
                 LoginActivity.this.start(MainActivity.class);
                 onBackPressed();

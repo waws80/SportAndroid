@@ -40,7 +40,7 @@ import okhttp3.ResponseBody;
  */
 public final class HttpUtils {
 
-    private static final String IP = "192.168.1.3:8080";
+    private static final String IP = "192.168.3.213:8080";
 
     public static final String BASE_URL = "http://" + IP + "/sport/";
 
@@ -92,6 +92,10 @@ public final class HttpUtils {
 
     public void post(String path, HashMap<String, String> body, DataCallback callback){
         this.call(buildRequest("POST", path, body), callback);
+    }
+
+    public void put(String path, HashMap<String, String> body, DataCallback callback){
+        this.call(buildRequest("PUT", path, body), callback);
     }
 
     public void uploadAvatar(File file, DataCallback callback){
@@ -175,9 +179,16 @@ public final class HttpUtils {
                         });
                     }
                 }else {
+                    ResponseBody body = response.body();
+                    String msg = "请求出错";
+                    if (body != null){
+                        msg = body.string();
+                    }
+                    Log.d("HttpResult", "http结果:code=========== " + msg + "================");
+                    String finalMsg = msg;
                     ThreadUtils.runMain(() -> {
                         callback.complete();
-                        callback.setResultData(new ResultBean(response.code(), "请求失败", ""));
+                        callback.setResultData(new ResultBean(response.code(), finalMsg, ""));
                         callback.onFailed();
                     });
                 }

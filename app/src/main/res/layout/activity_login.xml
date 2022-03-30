@@ -55,6 +55,7 @@
     <Button
         android:id="@+id/btn_login"
         android:text="登录"
+        android:textColor="@color/white"
         android:layout_marginTop="30dp"
         android:layout_marginLeft="24dp"
         android:layout_marginRight="24dp"
@@ -92,7 +93,7 @@
             android:id="@+id/tv_register"
             android:text="注册"
             android:textColor="@color/color_999"
-            android:textSize="18sp"
+            android:textSize="16sp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:layout_width="wrap_content"

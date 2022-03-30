@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <TextView
+        android:hint="请输入搜索内容"
+        android:textSize="16sp"
+        android:paddingLeft="8dp"
+        android:layout_margin="24dp"
+        android:translationZ="16dp"
+        android:gravity="center_vertical"
+        android:background="@drawable/shape_edit_bg"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"/>
+
+
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_marginTop="86dp"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <GridLayout
+                android:columnCount="3"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:text="跑步"
+                    android:textSize="13sp"
+                    android:paddingLeft="8dp"
+                    android:layout_gravity="center"
+                    android:gravity="center_vertical"
+                    android:layout_rowWeight="1"
+                    android:drawablePadding="8dp"
+                    android:drawableTop="@drawable/ic_running"
+                    android:layout_columnWeight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:text="骑行"
+                    android:textSize="13sp"
+                    android:paddingLeft="8dp"
+                    android:layout_gravity="center"
+                    android:gravity="center_vertical"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"
+                    android:drawablePadding="8dp"
+                    android:drawableTop="@drawable/ic_ride"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:text="跳绳"
+                    android:textSize="13sp"
+                    android:paddingLeft="8dp"
+                    android:layout_gravity="center"
+                    android:gravity="center_vertical"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"
+                    android:drawablePadding="8dp"
+                    android:drawableTop="@drawable/ic_skipping_rope"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:text="健身操"
+                    android:textSize="13sp"
+                    android:paddingLeft="8dp"
+                    android:layout_gravity="center"
+                    android:gravity="center_vertical"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"
+                    android:layout_marginTop="16dp"
+                    android:drawablePadding="8dp"
+                    android:drawableTop="@drawable/ic_aerobics"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+
+                <TextView
+                    android:text="瑜伽"
+                    android:textSize="13sp"
+                    android:paddingLeft="8dp"
+                    android:layout_gravity="center"
+                    android:gravity="center_vertical"
+                    android:layout_rowWeight="1"
+                    android:layout_columnWeight="1"
+                    android:layout_marginTop="16dp"
+                    android:drawablePadding="8dp"
+                    android:drawableTop="@drawable/ic_yoga"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:text="更多"
+                    android:textSize="13sp"
+                    android:paddingLeft="8dp"
+                    android:layout_gravity="center"
+                    android:gravity="center_vertical"
+                    android:layout_rowWeight="1"
+                    android:drawablePadding="8dp"
+                    android:drawableTop="@drawable/ic_more"
+                    android:layout_columnWeight="1"
+                    android:layout_marginTop="16dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+
+            </GridLayout>
+
+
+
+            <TextView
+                android:text="推荐课程"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:textColor="#232323"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+
+
+        </LinearLayout>
+
+
+
+
+
+    </androidx.core.widget.NestedScrollView>
+
+</RelativeLayout>

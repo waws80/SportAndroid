@@ -18,6 +18,7 @@ import com.bumptech.glide.Glide;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.sql.Date;
 import java.util.Calendar;
 import java.util.HashMap;
 
@@ -38,6 +39,13 @@ public class RegisterActivity extends BaseActivity<ActivityRegisterBinding> {
 
     @Override
     protected void onLoad(@Nullable Bundle savedInstanceState) {
+
+        mViewBinding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
 
         mViewBinding.rlAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,9 +99,9 @@ public class RegisterActivity extends BaseActivity<ActivityRegisterBinding> {
             public void onClick(View v) {
                 Calendar calendar=Calendar.getInstance();
                 DatePickerDialog dialog=new DatePickerDialog(mViewBinding.edtBirthday.getContext(), (view, year, month, dayOfMonth) -> {
-                    String strDate = year + "-" + (month + 1) + "-"+dayOfMonth;
+                    String strDate = year + "-" + month + "-"+dayOfMonth;
                     mViewBinding.edtBirthday.setText(strDate);
-                    java.sql.Date date = new java.sql.Date(year - 1900, month + 1, dayOfMonth);
+                    Date date = new Date(year - 1900, month, dayOfMonth);
                     birthDayDate = date.getTime();
 
                 },calendar.get(Calendar.YEAR),
@@ -194,7 +202,6 @@ public class RegisterActivity extends BaseActivity<ActivityRegisterBinding> {
 
             @Override
             protected void onData(HttpUtils.ResultBean bean) {
-                Log.d("TAG", "onData: " + bean.getData());
                 UserDefault.getInstance().putUserInfo(bean.getEntity(UserBean.class));
                 setResult(Activity.RESULT_OK);
                 onBackPressed();

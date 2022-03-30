@@ -12,12 +12,14 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BaiduMapOptions;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MarkerOptions;
+import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
@@ -26,6 +28,7 @@ import java.lang.ref.WeakReference;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import edu.wj.sport.android.R;
+import edu.wj.sport.android.SportApplication;
 
 public final class BaiduMapLocationHelper  extends BDAbstractLocationListener implements LifecycleObserver {
 
@@ -43,6 +46,8 @@ public final class BaiduMapLocationHelper  extends BDAbstractLocationListener im
 
     private final AtomicBoolean firstLocation = new AtomicBoolean(true);
 
+    private final AtomicBoolean flashMapLocation = new AtomicBoolean(false);
+
 
     public void bind(LifecycleOwner owner, MapView mapView){
         this.bind(owner, mapView, null);
@@ -54,7 +59,15 @@ public final class BaiduMapLocationHelper  extends BDAbstractLocationListener im
         this.mapWeakReference = new WeakReference<>(mapView.getMap());
         this.mOnLocation = onLocation;
         owner.getLifecycle().addObserver(this);
-        this.locationClientWeakReference = new WeakReference<>(new LocationClient(mapView.getContext()));
+        this.locationClientWeakReference = new WeakReference<>(new LocationClient(SportApplication.getApplication()));
+    }
+
+    /**
+     * 是否根据定位信息刷新当前地图显示位置
+     * @param flash
+     */
+    public void setFlashMapLocation(boolean flash){
+        flashMapLocation.set(flash);
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
@@ -68,25 +81,18 @@ public final class BaiduMapLocationHelper  extends BDAbstractLocationListener im
         }
         BaiduMap map = this.mapWeakReference.get();
         if (map != null){
+            //打开室内图，默认为关闭状态
+            map.setIndoorEnable(true);
+            map.setMapType(BaiduMap.MAP_TYPE_NORMAL);
             map.setMyLocationEnabled(true);
+            MyLocationConfiguration configuration =
+                    new MyLocationConfiguration(MyLocationConfiguration.LocationMode.FOLLOWING,
+                            true,
+                            BitmapDescriptorFactory.fromResource(R.drawable.map_icon_start),
+                            0xAAFFFF88,
+                            0xAA00FF00);
+            map.setMyLocationConfiguration(configuration);
         }
-
-        LocationClient client = this.locationClientWeakReference.get();
-        if (client == null){
-            return;
-        }
-        LocationClientOption option = new LocationClientOption();
-        option.setOpenGps(true); // 打开gps
-        option.setCoorType("bd09ll"); // 设置坐标类型
-        option.setScanSpan(1000);
-        option.setIsNeedAddress(true);
-        option.setNeedNewVersionRgc(true);
-        //设置locationClientOption
-        client.setLocOption(option);
-        //注册LocationListener监听器
-        client.registerLocationListener(this);
-        //开启地图定位图层
-        client.start();
 
     }
 
@@ -101,6 +107,27 @@ public final class BaiduMapLocationHelper  extends BDAbstractLocationListener im
             return;
         }
         mapView.onResume();
+
+        LocationClient client = this.locationClientWeakReference.get();
+        if (client == null){
+            return;
+        }
+        if (client.isStarted()){
+            return;
+        }
+        LocationClientOption option = new LocationClientOption();
+        option.setOpenGps(true); // 打开gps
+        option.setCoorType("bd09ll"); // 设置坐标类型
+        option.setScanSpan(2000);
+        option.setIsNeedAddress(true);
+        option.setNeedNewVersionRgc(true);
+        option.setIgnoreKillProcess(true);
+        //设置locationClientOption
+        client.setLocOption(option);
+        //注册LocationListener监听器
+        client.registerLocationListener(this);
+        //开启地图定位图层
+        client.start();
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
@@ -155,6 +182,7 @@ public final class BaiduMapLocationHelper  extends BDAbstractLocationListener im
 
     @Override
     public void onReceiveLocation(BDLocation location) {
+        Log.d(TAG, "onReceiveLocation: ");
         if (this.ownerWeakReference == null){
             return;
         }
@@ -180,19 +208,12 @@ public final class BaiduMapLocationHelper  extends BDAbstractLocationListener im
                 .direction(location.getDirection()).latitude(location.getLatitude())
                 .longitude(location.getLongitude()).build();
 
-        BaiduMap baiduMap = this.mapWeakReference.get();
-        if (baiduMap == null){
-            return;
-        }
-        baiduMap.setMyLocationData(locData);
-
         if (location.getLocType() == 61 || location.getLocType() == 66 || location.getLocType() == 161){
             if (location.getAddrStr() == null){
                 return;
             }
             if (this.mOnLocation != null){
                 if (firstLocation.get()){
-                    firstLocation.set(false);
                     this.mOnLocation.onFirstLocation(location);
                     this.markStart(location.getLatitude(), location.getLongitude(), R.drawable.map_icon_start);
 
@@ -201,11 +222,17 @@ public final class BaiduMapLocationHelper  extends BDAbstractLocationListener im
             }
         }
 
-        if (owner.getLifecycle().getCurrentState() == Lifecycle.State.RESUMED){
+        if (owner.getLifecycle().getCurrentState() == Lifecycle.State.RESUMED && (this.flashMapLocation.get() || this.firstLocation.get())){
             LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
             MapStatus.Builder builder = new MapStatus.Builder();
             builder.target(ll).zoom(16.0f);
+            BaiduMap baiduMap = this.mapWeakReference.get();
+            if (baiduMap == null){
+                return;
+            }
+            baiduMap.setMyLocationData(locData);
             baiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
+            firstLocation.set(false);
         }
     }
 

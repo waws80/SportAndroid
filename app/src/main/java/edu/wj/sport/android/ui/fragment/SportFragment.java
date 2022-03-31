@@ -4,34 +4,27 @@ import android.util.Log;
 import android.view.View;
 
 import com.baidu.location.BDLocation;
-import com.baidu.mapapi.map.BaiduMap;
-import com.baidu.mapapi.map.MapPoi;
-import com.baidu.mapapi.map.MapStatus;
-import com.baidu.mapapi.map.MapStatusUpdateFactory;
-import com.baidu.mapapi.map.Overlay;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.utils.DistanceUtil;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import edu.wj.sport.android.R;
 import edu.wj.sport.android.common.BaseFragment;
 import edu.wj.sport.android.databinding.FragmentSportBinding;
 import edu.wj.sport.android.ui.MainActivity;
+import edu.wj.sport.android.ui.SportHistoryActivity;
 import edu.wj.sport.android.utils.BaiduMapLocationHelper;
+import edu.wj.sport.android.utils.DateUtils;
+import edu.wj.sport.android.utils.GsonUtils;
+import edu.wj.sport.android.utils.HttpUtils;
 
 public class SportFragment extends BaseFragment<FragmentSportBinding> {
 
     private final BaiduMapLocationHelper helper = new BaiduMapLocationHelper();
-
-
-    private ScheduledExecutorService schedulerThread;
 
     long startTime = 0;
 
@@ -49,10 +42,10 @@ public class SportFragment extends BaseFragment<FragmentSportBinding> {
             @Override
             public void onLocation(BDLocation location) {
 
-                if (helper.isFlashMapLocation()){
+                if (helper.isFlashMapLocation()) {
 
                     latLngs.add(new LatLng(location.getLatitude(), location.getLongitude()));
-                    if (latLngs.size() == 1){
+                    if (latLngs.size() == 1) {
                         //标记起始点
                         helper.markStart(location.getLatitude(), location.getLongitude(), R.drawable.map_icon_start);
                     }
@@ -72,34 +65,71 @@ public class SportFragment extends BaseFragment<FragmentSportBinding> {
         mViewBinding.ivStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity)requireActivity()).changeTabBar();
+                ((MainActivity) requireActivity()).changeTabBar(mViewBinding.ivStatus.isChecked());
                 helper.setFlashMapLocation(mViewBinding.ivStatus.isChecked());
-                if (mViewBinding.ivStatus.isChecked()){
-                    schedulerThread = Executors.newSingleThreadScheduledExecutor();
+                if (mViewBinding.ivStatus.isChecked()) {
                     startTime = System.currentTimeMillis();
-                    latLngs.clear();
-                    mViewBinding.mapView.getMap().clear();
-                }else {
-                    if (latLngs.size() > 1){
+                } else {
+                    if (latLngs.size() > 1) {
                         LatLng latLng = latLngs.get(latLngs.size() - 1);
                         helper.markStart(latLng.latitude, latLng.longitude, R.drawable.map_icon_end);
                     }
-                    schedulerThread.shutdown();
-                    schedulerThread = null;
+                    //结束运动上传运动数据
+                    startUploadSportData();
 
                 }
             }
         });
 
-        mViewBinding.mapView.getMap().setOnMapClickListener(new BaiduMap.OnMapClickListener() {
+
+        mViewBinding.tvHistory.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onMapClick(LatLng latLng) {
-                ((MainActivity)requireActivity()).changeTabBar();
+            public void onClick(View v) {
+                start(SportHistoryActivity.class);
+            }
+        });
+
+    }
+
+    private void startUploadSportData() {
+
+        if (latLngs.size() <=2){
+            toast("运动距离太短，忽略本次数据");
+            latLngs.clear();
+            mViewBinding.mapView.getMap().clear();
+            return;
+        }
+
+        //本次运动时长
+        long duration = (System.currentTimeMillis() - startTime) / 1000;
+
+        //总距离
+        double mileage = Double.parseDouble(mViewBinding.tvTotal.getText().toString());
+
+        //点，轨迹
+        String points = GsonUtils.toJson(latLngs);
+
+        HashMap<String, String> body = new HashMap<>();
+        body.put("duration", String.valueOf(duration));
+        body.put("mileage", String.valueOf(mileage));
+        body.put("points", points);
+
+        HttpUtils.getInstance().post("sport/add", body, new HttpCallback(this) {
+            @Override
+            protected void onData(HttpUtils.ResultBean bean) {
+                toast("保存运动数据成功");
+                mViewBinding.tvDuration.setText("00:00:00");
+                mViewBinding.tvTotal.setText("0.0");
+                mViewBinding.tvSpeed.setText("0.0");
+
             }
 
             @Override
-            public void onMapPoiClick(MapPoi mapPoi) {
+            protected void complete() {
+                super.complete();
 
+                latLngs.clear();
+                mViewBinding.mapView.getMap().clear();
             }
         });
 
@@ -111,18 +141,18 @@ public class SportFragment extends BaseFragment<FragmentSportBinding> {
      */
     private void exeDuration() {
         long duration = System.currentTimeMillis() - startTime;
-        String durationStr = formatTime(duration / 1000);
+        String durationStr = DateUtils.formatTime(duration / 1000);
         mViewBinding.tvDuration.setText(durationStr);
     }
 
     /**
      * 计算速度
      */
-    private void exeSpeed(){
-        if (latLngs.size() > 1){
+    private void exeSpeed() {
+        if (latLngs.size() > 1) {
             LatLng end = latLngs.get(latLngs.size() - 1);
             LatLng second = latLngs.get(latLngs.size() - 2);
-            double s = DistanceUtil. getDistance(end, second);
+            double s = DistanceUtil.getDistance(end, second);
             //一小时运动的距离
             double total = (s * 60 * 60) / 1000.0;
             mViewBinding.tvSpeed.setText(String.format("%.1f", total));
@@ -132,16 +162,16 @@ public class SportFragment extends BaseFragment<FragmentSportBinding> {
     /**
      * 计算总里程
      */
-    private void exeSum(){
+    private void exeSum() {
         int total = 0;
 
         LatLng start;
-        if (latLngs.size() > 1){
+        if (latLngs.size() > 1) {
             start = latLngs.get(0);
             for (int i = 1; i < latLngs.size(); i++) {
 
                 LatLng latLng = latLngs.get(i);
-                total += DistanceUtil. getDistance(start, latLng);
+                total += DistanceUtil.getDistance(start, latLng);
                 start = latLng;
             }
         }
@@ -149,20 +179,5 @@ public class SportFragment extends BaseFragment<FragmentSportBinding> {
         double t = total / 1000.0;
 
         mViewBinding.tvTotal.setText(String.format("%.1f", t));
-    }
-
-
-    private String formatTime(long duration) {
-
-        long second = duration % 60;
-
-        long minute = duration / 60;
-
-        long hour = minute / 60;
-
-        Log.d("TAG", "formatTime: " + "duration = " + duration + "   sec = " + second + "   min = " + minute + " hour = " + hour);
-
-        return String.format("%02d", hour) + ":" + String.format("%02d", minute) + ":" + String.format("%02d", second);
-
     }
 }

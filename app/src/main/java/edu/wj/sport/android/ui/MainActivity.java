@@ -79,17 +79,15 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     }
 
-    public void changeTabBar(){
+    public void changeTabBar(boolean running){
         int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 56f, getResources().getDisplayMetrics());
         ViewGroup.LayoutParams layoutParams = mViewBinding.bottomView.getLayoutParams();
-        if (layoutParams.height == 0){
-            layoutParams.height = height;
-            mViewBinding.bottomView.setLayoutParams(layoutParams);
-        }else {
+        if (running){
             layoutParams.height = 0;
-            mViewBinding.bottomView.setLayoutParams(layoutParams);
+        }else {
+            layoutParams.height = height;
         }
-
+        mViewBinding.bottomView.setLayoutParams(layoutParams);
     }
 
 

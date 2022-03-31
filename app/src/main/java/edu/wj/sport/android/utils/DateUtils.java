@@ -1,5 +1,7 @@
 package edu.wj.sport.android.utils;
 
+import android.util.Log;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
@@ -40,5 +42,19 @@ public class DateUtils {
         BigDecimal decimal = new BigDecimal(value);
         decimal = decimal.setScale(2, RoundingMode.HALF_UP);
         return decimal.toString();
+    }
+
+    public static String formatTime(long duration) {
+
+        long second = duration % 60;
+
+        long minute = duration / 60;
+
+        long hour = minute / 60;
+
+        Log.d("TAG", "formatTime: " + "duration = " + duration + "   sec = " + second + "   min = " + minute + " hour = " + hour);
+
+        return String.format("%02d", hour) + ":" + String.format("%02d", minute) + ":" + String.format("%02d", second);
+
     }
 }

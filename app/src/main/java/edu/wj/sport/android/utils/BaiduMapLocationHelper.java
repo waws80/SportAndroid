@@ -240,6 +240,9 @@ public final class BaiduMapLocationHelper  extends BDAbstractLocationListener im
         return this.flashMapLocation.get();
     }
 
+    public void markStart(double lat, double lon, int res){
+        this.markStart(lat, lon, res, null);
+    }
 
     /**
      * 标记点
@@ -247,7 +250,7 @@ public final class BaiduMapLocationHelper  extends BDAbstractLocationListener im
      * @param lon
      * @param res
      */
-    public void markStart(double lat, double lon, int res){
+    public void markStart(double lat, double lon, int res, BaiduMap map){
 
         //定义Maker坐标点
         LatLng point = new LatLng(lat, lon);
@@ -261,18 +264,21 @@ public final class BaiduMapLocationHelper  extends BDAbstractLocationListener im
                 .scaleY(0.5f)
                 .icon(bitmap);
         //在地图上添加Marker，并显示
-        if (this.mapWeakReference == null){
-            return;
+        BaiduMap baiduMap = map;
+        if (baiduMap == null){
+            if (this.mapWeakReference == null){
+                return;
+            }
+            baiduMap = this.mapWeakReference.get();
         }
-        BaiduMap map = this.mapWeakReference.get();
-        if (map == null){
-            return;
-        }
-        map.addOverlay(option);
+        baiduMap.addOverlay(option);
     }
 
 
     public Overlay buildOverlayLine(List<LatLng> points, BaiduMap map){
+        if (points.size() == 1){
+            points.add(points.get(0));
+        }
         OverlayOptions mOverlayOptions = new PolylineOptions()
                 .width(10)
                 .color(0xAAFF0000)

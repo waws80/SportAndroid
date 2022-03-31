@@ -40,7 +40,7 @@ import okhttp3.ResponseBody;
  */
 public final class HttpUtils {
 
-    private static final String IP = "192.168.3.213:8080";
+    private static final String IP = "192.168.1.143:8080";
 
     public static final String BASE_URL = "http://" + IP + "/sport/";
 

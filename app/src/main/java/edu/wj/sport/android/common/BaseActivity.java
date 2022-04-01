@@ -117,8 +117,11 @@ public abstract class BaseActivity<VB extends ViewBinding> extends AppCompatActi
         protected void onError(HttpUtils.ResultBean bean) {
             bean.toast();
             if (bean.getCode() == 401 || bean.getCode() == 403){
+                UserDefault.getInstance().clear();
                 startActivity(new Intent(getWindow().getContext(), LoginActivity.class));
-                onBackPressed();
+                if (BaseActivity.this.getClass() != LoginActivity.class){
+                    onBackPressed();
+                }
 //                if (bean.getCode() == 403){
 //                    toast("当前账号被封禁");
 //                }else {

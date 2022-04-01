@@ -40,11 +40,11 @@ import okhttp3.ResponseBody;
  */
 public final class HttpUtils {
 
-    private static final String IP = "192.168.1.143:8080";
+    private static final String IP = "192.168.1.3:8080";
 
     public static final String BASE_URL = "http://" + IP + "/sport/";
 
-    public static final String IMG_URL = "http://" + IP + "/sport/resources/";
+    public static final String RES_URL = "http://" + IP + "/sport/resources/";
 
     /**
      * 设备信息
@@ -185,6 +185,13 @@ public final class HttpUtils {
                         msg = body.string();
                     }
                     Log.d("HttpResult", "http结果:code=========== " + msg + "================");
+                    if (response.code() == 401){
+                        msg = "请登录";
+                    }else if (response.code() == 403){
+                        msg = "您已被拉黑";
+                    }else if (response.code() == 400){
+                        msg = "参数错误";
+                    }
                     String finalMsg = msg;
                     ThreadUtils.runMain(() -> {
                         callback.complete();

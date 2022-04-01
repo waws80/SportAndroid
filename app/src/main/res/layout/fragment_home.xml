@@ -6,6 +6,7 @@
 
 
     <TextView
+        android:id="@+id/tv_search"
         android:hint="请输入搜索内容"
         android:textSize="16sp"
         android:paddingLeft="8dp"
@@ -35,6 +36,7 @@
                 android:layout_height="wrap_content">
 
                 <TextView
+                    android:id="@+id/tv_running"
                     android:text="跑步"
                     android:textSize="13sp"
                     android:paddingLeft="8dp"
@@ -48,6 +50,7 @@
                     android:layout_height="wrap_content"/>
 
                 <TextView
+                    android:id="@+id/tv_bycycle"
                     android:text="骑行"
                     android:textSize="13sp"
                     android:paddingLeft="8dp"
@@ -61,6 +64,7 @@
                     android:layout_height="wrap_content"/>
 
                 <TextView
+                    android:id="@+id/tv_rope"
                     android:text="跳绳"
                     android:textSize="13sp"
                     android:paddingLeft="8dp"
@@ -74,6 +78,7 @@
                     android:layout_height="wrap_content"/>
 
                 <TextView
+                    android:id="@+id/tv_aerobics"
                     android:text="健身操"
                     android:textSize="13sp"
                     android:paddingLeft="8dp"
@@ -89,6 +94,7 @@
 
 
                 <TextView
+                    android:id="@+id/tv_yoga"
                     android:text="瑜伽"
                     android:textSize="13sp"
                     android:paddingLeft="8dp"
@@ -103,6 +109,7 @@
                     android:layout_height="wrap_content"/>
 
                 <TextView
+                    android:id="@+id/tv_more"
                     android:text="更多"
                     android:textSize="13sp"
                     android:paddingLeft="8dp"

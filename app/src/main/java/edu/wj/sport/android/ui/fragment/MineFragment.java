@@ -69,7 +69,7 @@ public class MineFragment extends BaseFragment<FragmentMineBinding> {
     @Override
     public void onResume() {
         super.onResume();
-        String avatarUrl = HttpUtils.IMG_URL + "avatar/" + UserDefault.getInstance().getUserInfo().getAvatar();
+        String avatarUrl = HttpUtils.RES_URL + "avatar/" + UserDefault.getInstance().getUserInfo().getAvatar();
 
         String nickName = UserDefault.getInstance().getUserInfo().getNickname();
 

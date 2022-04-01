@@ -9,8 +9,6 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- 用于访问wifi网络信息，wifi信息会用于进行网络定位 -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> <!-- 这个权限用于获取wifi的获取权限，wifi信息会用来进行网络定位 -->
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-<!--    <uses-permission android:name="android.permission.BODY_SENSORS" />-->
-<!--    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />-->
 
     <application
         android:name=".SportApplication"
@@ -21,6 +19,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SportAndroid"
         android:usesCleartextTraffic="true">
+        <activity
+            android:name=".ui.CurriculumDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.SearchActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.TypeCurriculumActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.SportDetailActivity"
             android:exported="false" />
@@ -44,7 +51,8 @@
             android:exported="false" />
         <activity
             android:name=".ui.LoginActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:launchMode="singleTask" />
         <activity
             android:name=".ui.MainActivity"
             android:exported="true">

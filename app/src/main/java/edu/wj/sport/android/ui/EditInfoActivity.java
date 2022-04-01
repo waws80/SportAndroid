@@ -31,7 +31,7 @@ public class EditInfoActivity extends BaseActivity<ActivityEditInfoBinding> {
 
     @Override
     protected void onLoad(@Nullable Bundle savedInstanceState) {
-        String avatarUrl = HttpUtils.IMG_URL + "avatar/" + UserDefault.getInstance().getUserInfo().getAvatar();
+        String avatarUrl = HttpUtils.RES_URL + "avatar/" + UserDefault.getInstance().getUserInfo().getAvatar();
 
         String nickName = UserDefault.getInstance().getUserInfo().getNickname();
 
